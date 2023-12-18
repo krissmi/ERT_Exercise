@@ -1,0 +1,9 @@
+{% extends '_base.html' %}
+
+{% block content %}
+    <h1>{% block title %} RTSW - Real-time Space Weather{% endblock %}</h1>
+    <ol>
+        <li><a href="/rtsw/pull">Pull records</a></li>
+        <li><a href="/rtsw/dump">Display records as CSV</a></li>
+    </ol>
+{% endblock %}

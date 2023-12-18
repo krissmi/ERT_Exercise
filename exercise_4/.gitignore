@@ -1,0 +1,16 @@
+
+.DS_Store
+
+test_j
+
+*.o
+*.dSYM
+
+*.profraw
+*.profdata
+*.prof
+*.counts
+*.cov
+*.cpu
+*.out
+
