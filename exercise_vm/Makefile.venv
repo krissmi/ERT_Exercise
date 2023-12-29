@@ -1,0 +1,41 @@
+
+OS := $(shell uname)
+
+VENVDIR?=$(CURDIR)/venv
+VENV=$(VENVDIR)/bin
+
+.PHONY: venv venv.clean venv.show venv.debug venv.shell
+
+venv: $(VENV)
+
+$(VENV):
+	pip3 install --no-cache --upgrade pip wheel
+	pip3 install virtualenv
+	virtualenv $(VENVDIR)
+	$(VENV)/pip3 install --no-cache --upgrade pip wheel
+	@echo "======="
+	@echo "virtual environment created"
+	@echo "  activate with: . $(VENV)/activate"
+
+venv.clean:
+	rm -rf $(VENVDIR)
+
+venv.show: venv
+	@echo "venv     : $(VENVDIR)"
+#	@$(VENV)/python3 -c "import sys; print('Python ' + sys.version.replace('\n',''))"
+	@echo "prefix   : $(shell $(VENV)/python3 -c "import sys; print(sys.prefix)")"
+	@echo "versions :"
+	@$(VENV)/python3 -VV
+	@$(VENV)/pip3 --version
+
+venv.debug:
+	@echo "PATH (Shell)=$$PATH"
+	@$(MAKE) --version
+	$(info PATH (GNU Make)="$(PATH)")
+	$(info SHELL="$(SHELL)")
+	$(info VENVDIR="$(VENVDIR)")
+
+venv.shell: venv
+	. $(VENV)/activate && exec $(notdir $(SHELL))
+
+# END-OF-FILE

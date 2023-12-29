@@ -1,0 +1,11 @@
+.DS_Store
+
+__pycache__
+
+.idea/
+.vagrant/
+
+venv/
+
+provision/data/
+shared/

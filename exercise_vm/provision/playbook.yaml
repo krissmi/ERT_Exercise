@@ -1,0 +1,82 @@
+---
+- name: Configure Virtual Machine
+  hosts: all
+  gather_facts: false
+
+  pre_tasks:
+    - name: "collect host facts"
+      setup:
+        gather_subset: [ 'all', '!hardware' ]
+
+    - debug:
+        var: ansible_facts
+        verbosity: 3
+
+  tasks:
+    - name: update system
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
+        update_cache: True
+        update_only: True
+      become: true
+
+    - name: install git
+      ansible.builtin.dnf:
+        name: git
+        state: latest
+      become: true
+
+    - name: Clone exercise repository
+      ansible.builtin.git:
+        repo: git@github.com:krissmi/ERT_Exercise.git
+        dest: "{{ ansible_facts['user_dir'] }}/ert_exercise"
+        accept_newhostkey: true
+      environment:
+        GIT_TERMINAL_PROMPT: 0
+
+    - name: System tools
+      ansible.builtin.dnf:
+        name: '@system-tools'
+        state: latest
+      become: true
+
+    - name: Admin tools
+      ansible.builtin.dnf:
+        name: '@admin-tools'
+        state: latest
+      become: true
+
+    - name: Developer tools
+      ansible.builtin.dnf:
+        name:
+          - '@c-development'
+          - '@development-tools'
+        state: latest
+      become: true
+
+    - name: Engineering and science
+      ansible.builtin.dnf:
+        name:
+          - '@engineering-and-scientific'
+          - '@python-science'
+        state: latest
+      become: true
+
+    - name: Workstation UI
+      ansible.builtin.dnf:
+        name:
+          - '@workstation-product-environment'
+          - '@xfce-desktop-environment'
+          - '@lxde-desktop-environment'
+          - '@sway-desktop-environment'
+        state: latest
+      become: true
+
+    - name: Workstation utilities
+      ansible.builtin.dnf:
+        name:
+          - switchdesk
+          - switchdesk-gui
+        state: latest
+      become: true
