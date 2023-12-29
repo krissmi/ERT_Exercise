@@ -1,6 +1,9 @@
 
 OS := $(shell uname)
 
+.PHONY: help clean
+.DEFAULT_GOAL := help
+
 ########################################
 ## help
 help: ## Makefile help
