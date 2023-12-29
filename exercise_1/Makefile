@@ -11,9 +11,11 @@ MAKE := $(shell type -a make | head -1 | cut -d' ' -f1)
 
 SUBDIRS := $(wildcard iri*/.)
 
-.PHONY: all clean depends help $(SUBDIRS)
+.PHONY: help clean all depends $(SUBDIRS)
 .DEFAULT_GOAL := help
 
+########################################
+## help
 help: ## Makefile help
 	@echo "Active Targets:"
 	@echo "==============="
@@ -24,8 +26,12 @@ help: ## Makefile help
 $(SUBDIRS): 
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
+########################################
+## all
 all: $(SUBDIRS) install ## Build all project subdirectories
 
+########################################
+## depends
 depends: ## Project Dependencies
 ifeq ($(OS),Darwin)
 	brew install gcc make cmake gnuplot
@@ -34,9 +40,13 @@ else
 	exit 1
 endif
 
+########################################
+## clean
 clean: $(SUBDIRS) ## Remove build artifacts
 	rm -rf $(INSTALLPATH_ROOT)
 
+########################################
+## install
 install: $(SUBDIRS) ## Install test data files to local path $(INSTALLPATH_ROOT)
 	@echo "using root path: $(INSTALLPATH_ROOT)"
 	###### copy common data files
