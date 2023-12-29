@@ -1,12 +1,26 @@
 
 OS := $(shell uname)
 
+########################################
+## Python virtual environment
+include Makefile.venv
+
+PYTHON=$(VENV)/python3
+PIP=$(VENV)/pip3
+
+## Packages
+POETRY = $(VENV)/poetry
+
+########################################
+## System Commands
+
 GREP = grep
 SED = sed
 COLUMN = column
-PYTHON = python3
-POETRY = poetry
-PIP = pip
+
+########################################
+## System Packages
+
 HOMEBREW = brew
 DOCKER = docker
 COLIMA = colima
@@ -14,7 +28,10 @@ COLIMA = colima
 PACKAGE_NAME = swpctools
 PACKAGE_FILE = $(PACKAGE_NAME)-0.1.0.tar.gz
 
-.PHONY: clean depends help package.remove service.run
+########################################
+## Target Helpers
+
+.PHONY: help clean depends package.remove service.run
 .DEFAULT_GOAL := help
 
 ########################################
@@ -45,6 +62,8 @@ dump.rtsw: ## Pull RTSW records from local data store and save to CSV file
 ########################################
 ## depends
 depends: ## Setup project dependencies (requires: macOS 14.x)
+	$(PIP) install --no-cache --upgrade $(PIP)
+	$(PIP) install poetry  # python package support
 	$(PIP) install --requirement requirements.txt
 ifeq ($(OS),Darwin)
 	$(HOMEBREW) install docker docker-buildx colima

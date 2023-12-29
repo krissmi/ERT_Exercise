@@ -35,19 +35,19 @@ The source is available at: <https://services.swpc.noaa.gov/products/geospace/pr
 
 ## <ins>Dependencies</ins>
 
-| module   | version | location                                                |
-|----------|---------|---------------------------------------------------------|
-| python   | 3.10.x  | <https://www.python.org/downloads/release/python-3100/> |
-| requests | 2.31.0  | <https://docs.python-requests.org/en/latest/index.html> |
-| pandas   | 2.1.4   | <https://pandas.pydata.org/docs/index.html>             |
-| pyarrow  | 14.0.1  | <https://pypi.org/project/pyarrow/>                     |
-| flask    | 3.0.0   | <https://flask.palletsprojects.com/en/3.0.x/>           |
-| docker   | 24.0.x  | <https://www.docker.com>                                |
-| colima   | 0.6.7   | <https://github.com/abiosoft/colima>                    |
-| poetry   | 1.7.1   | <https://python-poetry.org/docs/>                       |
-| numpy    | 1.26.2  | <https://numpy.org>                                     |
-| waitress | 2.1.2   | <https://github.com/Pylons/waitress>                    |
-| psutil   | 5.9.6   | <https://github.com/giampaolo/psutil>                   |
+| module   | version | location                                                | packager |
+|----------|---------|---------------------------------------------------------|----------|
+| python   | 3.10.x  | <https://www.python.org/downloads/release/python-3100/> | system   |
+| docker   | 24.0.x  | <https://www.docker.com>                                | system   |
+| colima   | 0.6.7   | <https://github.com/abiosoft/colima>                    | system   |
+| requests | 2.31.0  | <https://docs.python-requests.org/en/latest/index.html> | python   |
+| pandas   | 2.1.4   | <https://pandas.pydata.org/docs/index.html>             | python   |
+| pyarrow  | 14.0.1  | <https://pypi.org/project/pyarrow/>                     | python   |
+| flask    | 3.0.0   | <https://flask.palletsprojects.com/en/3.0.x/>           | python   |
+| poetry   | 1.7.1   | <https://python-poetry.org/docs/>                       | python   |
+| numpy    | 1.26.2  | <https://numpy.org>                                     | python   |
+| waitress | 2.1.2   | <https://github.com/Pylons/waitress>                    | python   |
+| psutil   | 5.9.6   | <https://github.com/giampaolo/psutil>                   | python   |
 
 ## <ins>Quick Start</ins>
 
