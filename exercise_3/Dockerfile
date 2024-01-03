@@ -13,7 +13,7 @@ RUN chmod 400 /etc/sudoers.d/swpc
 WORKDIR /home/swpc
 
 RUN apt-get -y update
-RUN apt-get -y install gcc python3-dev curl sudo vim procps
+RUN apt-get -y install gcc python3-dev curl sudo vim procps iproute2
 
 COPY requirements.txt .
 RUN pip install --no-cache --upgrade pip wheel
