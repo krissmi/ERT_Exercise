@@ -47,9 +47,15 @@
         name:
           - passlib
 
-    - name: Create group
+    - name: Create user group
       group:
         name: ert_exercise
+        state: present
+      become: true
+
+    - name: Create docker group
+      group:
+        name: docker
         state: present
       become: true
 
@@ -61,7 +67,7 @@
         createhome: yes
         shell: /bin/zsh
         group: ert_exercise
-        groups: users,adm,vagrant
+        groups: users,adm,vagrant,docker
         append: yes
         expires: -1
         generate_ssh_key: yes
