@@ -54,13 +54,13 @@ help: ## Makefile help
 
 ########################################
 ## clean
-clean: ## Clean build artifacts
+clean: service.clean ## Clean all artifacts
 	rm -rf __pycache__
 	rm -rf data/ dist/ logs/
 
 ########################################
 ## depends
-depends: ## Setup project dependencies (requires: macOS 14.x)
+depends: venv ## Setup project dependencies (requires: macOS 14.x)
 	$(PIP) install --no-cache --upgrade pip
 
 ifeq ($(OS),Darwin)
