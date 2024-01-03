@@ -9,11 +9,15 @@
         gather_subset: [ 'all', '!hardware' ]
 
     - debug:
+        var: platform
+        verbosity: 2
+
+    - debug:
         var: ansible_facts
         verbosity: 3
 
   tasks:
-    - name: update system
+    - name: Update system
       ansible.builtin.dnf:
         name: '*'
         state: latest
@@ -21,62 +25,98 @@
         update_only: True
       become: true
 
-    - name: install git
-      ansible.builtin.dnf:
-        name: git
-        state: latest
-      become: true
-
-    - name: Clone exercise repository
-      ansible.builtin.git:
-        repo: git@github.com:krissmi/ERT_Exercise.git
-        dest: "{{ ansible_facts['user_dir'] }}/ert_exercise"
-        accept_newhostkey: true
-      environment:
-        GIT_TERMINAL_PROMPT: 0
-
-    - name: System tools
-      ansible.builtin.dnf:
-        name: '@system-tools'
-        state: latest
-      become: true
-
-    - name: Admin tools
-      ansible.builtin.dnf:
-        name: '@admin-tools'
-        state: latest
-      become: true
-
-    - name: Developer tools
+    - name: Install bootstrap tools
       ansible.builtin.dnf:
         name:
-          - '@c-development'
-          - '@development-tools'
+          - zsh
+          - git
+          - checkpolicy
         state: latest
       become: true
 
-    - name: Engineering and science
+    - name: Install bootstrap tools (Fedora)
       ansible.builtin.dnf:
         name:
-          - '@engineering-and-scientific'
-          - '@python-science'
+          - dkms
         state: latest
       become: true
+      when: platform|lower == 'fedora'
 
-    - name: Workstation UI
+    - name: Install python packages
+      ansible.builtin.pip:
+        name:
+          - passlib
+
+    - name: Create group
+      group:
+        name: ert_exercise
+        state: present
+      become: true
+
+    - name: Create user
+      user:
+        name: ert_exercise
+        password: "{{ 'ert1234' | password_hash('sha512') }}"
+        comment: "ERT Exercise"
+        createhome: yes
+        shell: /bin/zsh
+        group: ert_exercise
+        groups: users,adm,vagrant
+        append: yes
+        expires: -1
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/id_rsa
+        state: present
+      become: true
+
+    - name: Allow sudo
+      copy:
+        content: '%ert_exercise ALL=(ALL:ALL) NOPASSWD:ALL'
+        dest: /etc/sudoers.d/ert_exercise
+        mode: 0440
+      become: true
+
+    - name: Copy change user script
+      copy:
+        src: 'scripts/change-to-ert-user'
+        dest: '~/'
+        mode: 0700
+
+    - name: Fedora Packages
       ansible.builtin.dnf:
         name:
+          - '@system-tools'
+          - '@admin-tools'
           - '@workstation-product-environment'
-          - '@xfce-desktop-environment'
-          - '@lxde-desktop-environment'
-          - '@sway-desktop-environment'
+          - 'switchdesk'
+          - 'switchdesk-gui'
         state: latest
       become: true
+      when: platform|lower == 'fedora'
 
-    - name: Workstation utilities
+    - name: CentOS Packages
       ansible.builtin.dnf:
         name:
-          - switchdesk
-          - switchdesk-gui
+          - '@System Tools'
+          - '@Security Tools'
+          - '@Headless Management'
+          - '@Console Internet Tools'
         state: latest
+      become: true
+      when: platform|lower == 'centos'
+
+    - name: RHEL Packages
+      ansible.builtin.dnf:
+        name:
+          - '@System Tools'
+          - '@Security Tools'
+          - '@Headless Management'
+          - '@Console Internet Tools'
+        state: latest
+      become: true
+      when: platform|lower == 'rhel'
+
+    - name: Cleanup
+      command: 'dnf -y clean all'
       become: true

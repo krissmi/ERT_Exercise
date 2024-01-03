@@ -1,0 +1,5 @@
+#!/bin/bash
+
+setfacl -m ert_exercise:x "$(dirname ${SSH_AUTH_SOCK})"
+setfacl -m ert_exercise:rwx "${SSH_AUTH_SOCK}"
+sudo -Esu ert_exercise

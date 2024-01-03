@@ -1,5 +1,10 @@
 
-OS := $(shell uname)
+OS = $(shell uname)
+ifeq ($(OS),Linux)
+	DISTRO = $(shell cat /etc/os-release | grep -e "^ID=" | cut -d= -f2 | tr -d '"')
+else ifeq ($(OS),Darwin)
+	DISTRO = "macos"
+endif
 
 ########################################
 ## Python virtual environment
@@ -21,7 +26,11 @@ VAGRANT = vagrant
 ########################################
 ## System Commands
 
+GREP = grep
+SED = sed
+COLUMN = column
 SSH_ADD = ssh-add
+MKDIR = mkdir
 
 ########################################
 ## Virtual Machine
@@ -29,6 +38,18 @@ SSH_ADD = ssh-add
 export VAGRANT_HOME := $(CURDIR)/provision/data/.vagrant.d
 export VAGRANT_DOTFILE_PATH := $(CURDIR)/provision/data/.vagrant
 export ANSIBLE_HOME := $(CURDIR)/provision/data/.ansible
+
+ifeq ($(PLATFORM),fedora)
+	export BOX_NAME = file://boxes/fedora-39-aarch64.box
+endif
+
+ifeq ($(PLATFORM),centos)
+	export BOX_NAME = file://boxes/centos-9-aarch64.box
+endif
+
+ifeq ($(PLATFORM),rhel)
+	export BOX_NAME = file://boxes/rhel-9.3-aarch64.box
+endif
 
 ########################################
 ## Target Helpers
@@ -42,9 +63,11 @@ export ANSIBLE_HOME := $(CURDIR)/provision/data/.ansible
 ########################################
 ## help
 help: ## Makefile help
+	@echo "==============="
+	@echo "Platform: $(OS) ($(DISTRO))"
 	@echo "Active Targets:"
 	@echo "==============="
-	@$(GREP) -E '^[.a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+	@$(GREP) -E '^[.a-zA-Z0-9_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) \
 	| $(SED) -n 's/^\(.*\): \(.*\)##\(.*\)/\1,\3/p' \
 	| $(COLUMN) -t  -s ','
 
@@ -61,12 +84,12 @@ depends: venv ## Setup project dependencies
 	$(PIP) list --verbose
 
 vm.depends: depends ## Virtual machine dependencies
-	$(HOMEBREW) install utm vagrant
+	$(HOMEBREW) install vagrant
 	mkdir -p $(CURDIR)/provision/data
 	$(VAGRANT) plugin install vagrant-parallels
 
-vm.build: vm.depends ## Create virtual machine
-	$(VAGRANT) box add --force --provider parallels bento/fedora-38-arm64
+vm.build: vm.depends ## Create the virtual machine
+	$(VAGRANT) box add --force --provider parallels --name $(BOX_NAME) $(BOX_NAME)
 
 vm.list: ## Virtual machine status
 	$(VAGRANT) box list
@@ -75,7 +98,7 @@ vm.list: ## Virtual machine status
 	@echo "=========="
 	@$(VAGRANT) global-status
 
-vm.start: vm.depends vm.build ## Start the virtual machine
+vm.start: ## Start the virtual machine
 	@echo "<=============================>"
 	@echo "<=== !! PASSWORD PROMPT !! ===>"
 	@echo "<=============================>"
@@ -86,12 +109,18 @@ vm.start: vm.depends vm.build ## Start the virtual machine
 vm.kill: ## Stop (and destroy) the virtual machine
 	-$(VAGRANT) destroy --force
 
-vm.shell: vm.start ## Open a shell to the virtual machine
-	$(VAGRANT) ssh
+vm.shell: ## Open a shell to the virtual machine
+	-$(VAGRANT) ssh
+
+vm.config: ## Show machine configuration
+	-$(VAGRANT) ssh-config
+
+vm.reload: ## Restart the VM
+	$(VAGRANT) reload --provision
 
 vm.clean: vm.kill ## Clean virtual machine artifacts
-	-$(VAGRANT) box remove --all bento/fedora-38-arm64
-	rm -rf shared
+	-$(VAGRANT) box list | cut -f1 -d' ' | xargs -L 1 $(VAGRANT) box remove --all --force
+	rm -rf shared .vagrant
 	rm -rf $(CURDIR)/provision/data
 
 ## END-OF-FILE

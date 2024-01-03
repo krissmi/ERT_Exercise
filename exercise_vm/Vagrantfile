@@ -1,39 +1,91 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+REPO_PATH = File.dirname(File.dirname(__FILE__))
+
+PYTHON = "python3.11"
+
+PLATFORM = ENV['PLATFORM']
+BOX_NAME = ENV['BOX_NAME']
+MACHINE_NAME = "exercise-ert-%s" % PLATFORM
+
+
+puts "###### PLATFORM => %s" % PLATFORM
+puts "###### BOX_NAME => %s" % BOX_NAME
+puts "###### MACHINE  => %s" % MACHINE_NAME
+
 Vagrant.configure("2") do |config|
-    config.vm.box = "bento/fedora-38-arm64"
+    #
+    # machine name
+    config.vm.define MACHINE_NAME
+    #
+    # machine box
+    config.vm.box = BOX_NAME
     config.vm.box_check_update = true
-
-    config.vm.define "exercise-ert"
-
-    config.vm.hostname = "exercise-ert"
+    #
+    # machine networking
+    config.vm.hostname = MACHINE_NAME
     config.vm.network "public_network", type: "dhcp"
-
-    config.vm.synced_folder "shared/", "/vagrant/shared", create: true
+    #
+    # mounted machine directories
     config.vm.synced_folder ".", "/vagrant", disabled: true
-
+    config.vm.synced_folder "shared/", "/vagrant/shared", create: true
+    config.vm.synced_folder "%s/exercise_1" % REPO_PATH, "/exercises/exercise_1"
+    config.vm.synced_folder "%s/exercise_2" % REPO_PATH, "/exercises/exercise_2"
+    config.vm.synced_folder "%s/exercise_3" % REPO_PATH, "/exercises/exercise_3"
+    config.vm.synced_folder "%s/exercise_4" % REPO_PATH, "/exercises/exercise_4"
+    #
+    # SSH configuration
     config.ssh.username = "vagrant"
     config.ssh.keep_alive = true
     config.ssh.forward_agent = true
-
+    config.ssh.insert_key = false
+    config.ssh.private_key_path = [
+        "~/.ssh/id_rsa",
+        File.join(File.dirname(__FILE__), "provision", "id_rsa")
+    ]
+    #
+    # Parallels Provider
     config.vm.provider "parallels" do |prl|
-        prl.name = "exercise-ert"
+        prl.name = MACHINE_NAME
         prl.memory = "4096"
+        #
+        # update guest tools
+        prl.update_guest_tools = false
+        #
+        # Ensure a modern version of python
         config.vm.provision "shell" do |sh|
-            sh.privileged = false
+            sh.privileged = true
+            sh.env = {PYTHON: PYTHON}
             sh.inline = <<-SHELL
-                python3 -m ensurepip --upgrade --user
+                dnf install $PYTHON
             SHELL
         end
+        #
+        # install/upgrade python pip and ansible dependencies
+        config.vm.provision "shell" do |sh|
+            sh.privileged = false
+            sh.env = {PYTHON: PYTHON}
+            sh.inline = <<-SHELL
+                $PYTHON -m ensurepip --upgrade --user
+                $PYTHON -m pip install --upgrade pip
+                $PYTHON -m pip install packaging setuptools
+            SHELL
+        end
+        #
+        # provision the machine
         config.vm.provision "ansible" do |ansible|
             ansible.verbose = "vv"
             ansible.compatibility_mode = "2.0"
             ansible.playbook = "provision/playbook.yaml"
             ansible.config_file = "provision/ansible.cfg"
             ansible.extra_vars = {
-                ansible_python_interpreter: "/usr/bin/python3",
+                ansible_python_interpreter: "/usr/bin/%s" % PYTHON,
+                platform: "%s" % PLATFORM
             }
         end
+        #
+        # reboot
+        config.vm.provision 'shell', reboot: true
     end
 end
