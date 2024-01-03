@@ -70,6 +70,7 @@ ifeq ($(OS),Darwin)
 else ifeq ($(DISTRO),fedora)
 	sudo $(DNF) -y install gcc-gfortran binutils @c-development @development-tools
 else ifeq ($(DISTRO),rhel)
+	sudo $(DNF) -y groupinstall "Development Tools"
 	sudo $(DNF) -y install gcc-gfortran binutils
 else ifeq ($(DISTRO),centos)
 	sudo $(DNF) -y groupinstall "Development Tools"

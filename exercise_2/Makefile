@@ -37,6 +37,7 @@ ifeq ($(OS),Darwin)
 else ifeq ($(DISTRO),fedora)
 	sudo $(DNF) -y install git binutils binutils-gprofng strace @c-development @development-tools
 else ifeq ($(DISTRO),rhel)
+	sudo $(DNF) -y groupinstall "Development Tools"
 	sudo $(DNF) -y install git binutils strace
 else ifeq ($(DISTRO),centos)
 	sudo $(DNF) -y groupinstall "Development Tools"
