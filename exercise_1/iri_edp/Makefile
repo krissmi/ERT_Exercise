@@ -91,7 +91,7 @@ $(BINARY): $(BINARY).o ## Build iri_edp binary
 
 ########################################
 ## install
-install: $(BINARY) ## Install edp module to local path $(INSTALLPATH_ROOT)
+install: $(BINARY) ## Install edp module to local installation path $(INSTALLPATH_ROOT)
 	cp -vp $(CURDIR)/$(BINARY) $(INSTALLPATH_BIN)
 
 # END-OF-FILE

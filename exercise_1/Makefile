@@ -54,7 +54,6 @@ help: ## Makefile help
 
 ########################################
 ## subdirectories
-
 $(SUBDIRS): 
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 

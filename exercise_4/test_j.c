@@ -37,6 +37,7 @@ double function_j(double f, double fp, double fptilde)
   double gamma   = gC  * pow(fpt, gX);
   double sigma_a = saC * pow(fpt, saX);
   double sigma_b = sbC * pow(fpt, sbX);
+
   double exp1arg = -1.25 * pow((f / fp), -4);
   double sigma   = (f <= fp) * sigma_a + (f > fp) * sigma_b;
 

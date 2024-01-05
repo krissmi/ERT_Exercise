@@ -6,6 +6,8 @@
 
 *.o
 *.dylib
+*.so
 
 iritest
+**/iri_edp
 iri_edp.o

@@ -83,6 +83,12 @@
         mode: 0440
       become: true
 
+    - name: Add vagrant user to docker group
+      user:
+        name: vagrant
+        groups: docker
+        append: yes
+
     - name: Copy change user script
       copy:
         src: 'scripts/change-to-ert-user'
