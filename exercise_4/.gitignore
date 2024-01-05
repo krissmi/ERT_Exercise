@@ -1,6 +1,9 @@
 
 .DS_Store
 
+.vscode
+.idea
+
 test_j
 
 *.o
@@ -13,4 +16,5 @@ test_j
 *.cov
 *.cpu
 *.out
-*.data*
+perf.data
+perf.data.old

@@ -1,3 +1,4 @@
+
 .DS_Store
 
 .vscode
@@ -7,4 +8,4 @@
 *.dylib
 
 iritest
-iri_edp
+iri_edp.o
